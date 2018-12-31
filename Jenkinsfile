@@ -47,6 +47,7 @@ pipeline {
           sh "echo \$(jx-release-version) > VERSION"
           sh "mvn versions:set -DnewVersion=\$(cat VERSION)"
           sh "jx step tag --version \$(cat VERSION)"
+         sh "sudo apt-get install libpng-dev"
                     sh "mvn license:format"
 
           sh "mvn clean install -DskipTests"
