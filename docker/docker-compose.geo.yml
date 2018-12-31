@@ -1,0 +1,60 @@
+#
+# Copyright © 2016-2018 The Thingsboard Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+version: '2'
+
+services:
+  cassandra:
+    image: "cassandra:3.11.2"
+    ports:
+    - "9142:9042"
+    - "9160:9160"
+    volumes:
+    - "${CASSANDRA_DATA_DIR}:/var/lib/cassandra"
+    restart: always
+  thingsboard:
+    image: "thingsboard/application:2.1.0"
+    ports:
+    - "8080:8080"
+    - "1883:1883"
+    - "5683:5683/udp"
+    env_file:
+    - tb.env
+    entrypoint: /run-application.sh
+    depends_on:
+    - cassandra
+    links :
+    - geoserver:geoserver
+    restart: always
+  postgis:
+    image: "thingsboard/postgis:9.5"
+    volumes:
+    - "${POSTGIS_DATA_DIR}:/var/lib/postgresql"
+    environment:
+    - "ALLOW_IP_RANGE=0.0.0.0/0"
+    ports:
+    - "5432:5432"
+    restart: always
+  geoserver:
+    image: "thingsboard/geoserver:2.11.2"
+    ports:
+    - "8010:8090"
+    links :
+    - postgis:postgis
+    depends_on :
+    - postgis
+    restart: always
+

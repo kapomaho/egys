@@ -1,0 +1,13 @@
+VERSION=2.1.0
+PROJECT=thingsboard
+APP=application
+
+build:
+	cp /usr/local/share/ca-certificates/PCAcert.crt .
+	docker pull rowanto/docker-java8-mvn-nodejs-npm
+	docker build --build-arg user_name=${USER} --build-arg user_id=`id -u ${USER}` --build-arg group_id=`id -g ${USER}` -f Dockerfile.dev --pull -t ${PROJECT}/${APP}:${VERSION} -t ${PROJECT}/${APP}:latest .
+	rm PCAcert.crt
+
+push: build
+	docker push ${PROJECT}/${APP}:${VERSION}
+	docker push ${PROJECT}/${APP}:latest

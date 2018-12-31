@@ -1,0 +1,145 @@
+<!--
+
+    Copyright © 2016-2018 The Thingsboard Authors
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<md-button ng-click="onMakePublic({event: $event})"
+		   ng-show="!isEdit && cameraScope === 'tenant' && !camera.publicCustomerId"
+		   class="md-raised md-primary">{{ 'camera.make-public' | translate }}</md-button>
+<md-button ng-click="onMakePrivate({event: $event})"
+		   ng-show="!isEdit && ((cameraScope === 'tenant' && camera.publicCustomerId ||
+		   						cameraScope === 'customer' && customerId == camera.publicCustomerId))"
+		   class="md-raised md-primary">{{ 'camera.make-private' | translate }}</md-button>
+<md-button ng-click="onManageAssignedCustomers({event: $event})"
+		   ng-show="!isEdit && cameraScope === 'tenant'"
+		   class="md-raised md-primary">{{ 'camera.manage-assigned-customers' | translate }}</md-button>
+<md-button ng-click="onUnassignFromCustomer({event: $event})"
+		   ng-show="!isEdit && cameraScope === 'customer' && customerId != camera.publicCustomerId"
+		   class="md-raised md-primary">{{ 'camera.unassign-from-customer' | translate }}</md-button>
+<md-button ng-click="onDeleteCamera({event: $event})"
+           ng-show="!isEdit && cameraScope === 'tenant'"
+           class="md-raised md-primary">{{ 'camera.delete' | translate }}</md-button>
+
+<div layout="row">
+    <md-button ngclipboard data-clipboard-action="copy"
+               ngclipboard-success="onCameraIdCopied(e)"
+               data-clipboard-text="{{camera.id.id}}" ng-show="!isEdit"
+               class="md-raised">
+        <md-icon md-svg-icon="mdi:clipboard-arrow-left"></md-icon>
+        <span translate>camera.copyId</span>
+    </md-button>
+</div>
+
+<md-content class="md-padding" layout="column">
+    <md-input-container class="md-block"
+                        ng-show="!isEdit && isAssignedToCustomer && !isPublic && cameraScope === 'tenant'">
+        <label translate>camera.assignedToCustomer</label>
+        <input ng-model="assignedCustomer.title" disabled>
+    </md-input-container>
+    <div class="tb-small" style="padding-bottom: 10px; padding-left: 2px;"
+         ng-show="!isEdit && isPublic && (cameraScope === 'customer' || cameraScope === 'tenant')">
+        {{ 'camera.camera-public' | translate }}
+    </div>
+    <fieldset ng-disabled="loading || !isEdit">
+        <md-input-container class="md-block">
+            <label translate>camera.name</label>
+            <input required name="name" ng-model="camera.name">
+            <div ng-messages="theForm.name.$error">
+                <div translate ng-message="required">camera.name-required</div>
+            </div>
+        </md-input-container>
+
+        <tb-entity-subtype-autocomplete
+                ng-disabled="loading || !isEdit"
+                tb-required="true"
+                the-form="theForm"
+                ng-model="camera.type"
+                entity-type="types.entityType.camera">
+        </tb-entity-subtype-autocomplete>
+
+        <md-input-container class="md-block">
+            <label translate>camera.brand</label>
+            <input required name="brand" ng-model="camera.brand">
+            <div ng-messages="theForm.name.$error">
+                <div translate ng-message="required">camera.brand-required</div>
+            </div>
+        </md-input-container>
+
+        <md-input-container class="md-block">
+            <label translate>camera.model</label>
+            <input required name="model" ng-model="camera.model">
+            <div ng-messages="theForm.name.$error">
+                <div translate ng-message="required">camera.model-required</div>
+            </div>
+        </md-input-container>
+
+        <md-input-container class="md-block">
+            <label translate>camera.host</label>
+            <input required name="host" ng-model="camera.host">
+            <div ng-messages="theForm.name.$error">
+                <div translate ng-message="required">camera.host-required</div>
+            </div>
+        </md-input-container>
+
+        <md-input-container class="md-block">
+            <label translate>camera.port</label>
+            <input name="port" ng-model="camera.port">
+        </md-input-container>
+
+        <md-input-container class="md-block">
+            <label translate>camera.channel-no</label>
+            <input name="channelNo" ng-model="camera.channelNo">
+        </md-input-container>
+
+        <md-input-container class="md-block">
+            <label translate>camera.primary-url-path</label>
+            <input required name="primaryUrlPath" ng-model="camera.primaryUrlPath">
+            <div ng-messages="theForm.name.$error">
+                <div translate ng-message="required">camera.primary-url-path-required</div>
+            </div>
+        </md-input-container>
+
+        <md-input-container class="md-block">
+            <label translate>camera.secondary-url-path</label>
+            <input required name="secondaryUrlPath" ng-model="camera.secondaryUrlPath">
+            <div ng-messages="theForm.name.$error">
+                <div translate ng-message="required">camera.secondary-url-path-required</div>
+            </div>
+        </md-input-container>
+
+        <md-checkbox class="md-block" ng-model="camera.ptz" ng-disabled="loading || !isEdit">
+            <label translate>camera.is-controllable</label>
+        </md-checkbox>
+
+        <md-checkbox class="md-block" ng-model="camera.rtspAuth" ng-disabled="loading || !isEdit">
+            <label translate>camera.is-rtsp-auth</label>
+        </md-checkbox>
+
+        <md-input-container class="md-block">
+            <label translate>camera.username</label>
+            <input name="username" ng-model="camera.username">
+        </md-input-container>
+    
+        <md-input-container class="md-block">
+            <label translate>camera.password</label>
+            <input name="password" ng-model="camera.password">
+        </md-input-container>
+        
+        <md-input-container class="md-block">
+            <label translate>camera.description</label>
+            <textarea ng-model="camera.additionalInfo.description" rows="2"></textarea>
+        </md-input-container>
+    </fieldset>
+</md-content>

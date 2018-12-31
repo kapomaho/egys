@@ -1,0 +1,69 @@
+pipeline {
+	
+	agent 
+                   {
+                   any{
+                        // customWorkspace '/home/mahir/mahir-workspace/egys'
+                   }
+                   }
+triggers { pollSCM('H */4 * * 1-5') }
+	stages {
+		stage ('Build') {
+			steps {
+				//Checkout Step
+				echo '### Getting Source Code ###'
+				checkout scm
+								
+				//Build Step
+				echo '### Building Source Code ###'
+				
+				echo '## Maven Build with pom.xml ##'
+                
+                ws("/home/mahir/mahir-workspace/egys") {
+				sh "mvn -f 'pom.xml' clean install -DskipTests -Dlicense.skip=true"
+}
+			}
+		}
+		
+		stage ('Deploy') {
+			steps {
+				echo '### Deploying the Product ###'
+			}
+		}
+		
+		stage ('Make a File') {
+			steps {
+				echo '### Creating a Make File ###'
+				sh "cd /home/mahir/mahir-workspace/egys/docker/tb/;make -f Makefile.dev"
+				
+			}
+		}
+		
+
+		stage ('Docker Compose Up') {
+			steps {
+				echo '### Deploying the Product ###'
+				sh "cd docker/"
+				sh 'cd /home/mahir/mahir-workspace/egys/docker;docker-compose -f docker-compose.dev.yml up -d'
+			}
+		}
+		
+		stage ('Test') {
+			steps {
+				//SCA Step
+				echo '### Making Static Code Analysis ###'
+				//What to analyse
+				//Where to analyse
+				//Can be parallel with the Deploy stage
+				
+				//Test Step
+				echo '### Testing the Product ###'
+				//What to test
+				
+				//Record Step
+				echo '### Recording the Results ###'
+				//Publish results to JIRA??
+			}
+		}
+	}
+}

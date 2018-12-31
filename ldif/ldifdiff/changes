@@ -1,0 +1,15 @@
+dn: uid=mahir,ou=foasoperatorusirnak,dc=test-botas,dc=org
+changetype: add
+cn: Mahir
+objectclass: inetOrgPerson
+objectclass: top
+ou: foasoperatorusirnak
+sn:: WcSxbGTEsXLEsW0=
+uid: mahir
+userpassword: {SHA}QL0AFWMIX8NRZTKeof9cXsvbvu8=
+
+dn: uid=dguloz,ou=foasoperatorusirnak,dc=test-botas,dc=org
+changetype: modify
+replace: userpassword
+userpassword: {SHA}NWoZK3kTsExUV00Ywo1G5jlUKKs=
+

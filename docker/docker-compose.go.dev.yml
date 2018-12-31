@@ -1,0 +1,71 @@
+#
+# Copyright © 2016-2018 The Thingsboard Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+version: '2'
+
+services:
+  tb:
+    image: "tb_dev/app:1.4.0"
+    ports:
+    - "${TB_PORT}:8080"
+    - "${UI_PORT}:3000"
+    - "${DEBUG_PORT}:4000"
+    - "1883:1883"
+    - "5683:5683/udp"
+    env_file:
+    - tb.env
+    environment:
+    - ADD_SCHEMA_AND_SYSTEM_DATA=${ADD_SCHEMA_AND_SYSTEM_DATA}
+    - ADD_DEMO_DATA=${ADD_DEMO_DATA}
+    - DEBUG_MODE=${DEBUG_MODE}
+    - DEBUG_PORT=${DEBUG_PORT}
+    - UI_PORT=${UI_PORT}
+    - TB_PORT=${TB_PORT}
+    - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED}
+    volumes:
+    - "${HSQLDB_DATA_DIR}:/usr/share/thingsboard/data/sql"
+    - "${APP_SRC_DIR}:/app"
+    - "/home/${USER}/.m2:/home/${USER}/.m2"
+      - "/etc/localtime:/etc/localtime"
+    entrypoint: /run-application.sh
+  cassandra:
+    image: "cassandra:3.11.2"
+    ports:
+    - "9042"
+    - "9160"
+    volumes:
+    - "${CASSANDRA_DATA_DIR}:/var/lib/cassandra"
+  zk:
+    image: "zookeeper:3.4.10"
+    ports:
+    - "2181"
+    restart: always
+  postgres:
+    image: "postgres:9.6"
+    ports:
+    - "5432"
+    environment:
+    - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+    - "${POSTGRES_DATA_DIR}:/var/lib/postgresql/data"
+  go:
+    image: "go"
+    command: tail -F anything
+    volumes:
+    - "../:/files"
+    - "${GO_SRC_DIR}:/ldifsrc"
+    ports:
+    - "9090:9090"
