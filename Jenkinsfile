@@ -19,6 +19,7 @@ pipeline {
       }
       steps {
         container('maven') {
+          sh "mvn license:format"
           sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
           sh "mvn clean install -DskipTests"
           sh "export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml"
